@@ -75,6 +75,8 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
+const searchForm = document.getElementById('search-form');
+const searchBar = document.getElementById('search-bar');
 
 class App {
   #map;
@@ -83,37 +85,86 @@ class App {
   #workouts = [];
 
   constructor() {
-    // Get user's position
+    //get positon
     this._getPosition();
+    this.#map = null; // Initialize the map variable
+
+    searchForm.addEventListener('submit', e => {
+      e.preventDefault(); // Prevent the form from submitting normally
+      const query = searchBar.value; // Get the value from the search bar
+      console.log('Search query:', query);
+      this._geocodeCity(query); // Arrow function preserves the context of `this`
+    });
 
     // Get data from local storage
     this._getLocalStorage();
 
     // Attach event handlers
+
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
   _getPosition() {
+    searchForm.addEventListener('submit', function (e) {
+      e.preventDefault(); // Prevent the form from submitting normally
+
+      const query = searchBar.value; // Get the value from the search bar
+
+      // Example: Log the query to the console
+      console.log('Search query:', query);
+      this._geocodeCity(query);
+    });
+  }
+
+  _getPosition() {
     if (navigator.geolocation)
       navigator.geolocation.getCurrentPosition(
-        this._loadMap.bind(this),
+        position => {
+          const lan = position.coords.latitude;
+          const lon = position.coords.longitude;
+          console.log(lan, lon); // For testing, you can see the coords in the console
+          this._loadMap(lan, lon);
+        },
         function () {
           alert('Could not get your position');
         }
       );
   }
 
-  _loadMap(position) {
-    const { latitude } = position.coords;
-    const { longitude } = position.coords;
-    // console.log(`https://www.google.pt/maps/@${latitude},${longitude}`);
+  _geocodeCity(cityName) {
+    fetch(
+      `https://nominatim.openstreetmap.org/search?city=${cityName}&format=json`
+    )
+      .then(response => response.json())
+      .then(data => {
+        if (data.length > 0) {
+          const lat = data[0].lat;
+          const lon = data[0].lon;
+          this._loadMap(lat, lon);
+        } else {
+          console.error('City not found');
+        }
+      })
+      .catch(error => console.error('Error:', error));
+  }
 
-    const coords = [latitude, longitude];
+  // _handleCoordinates(lat, lon) {
+  // Handle the coordinates here, for example, updating the map
+  // console.log('Latitude:', lat);
+  // console.log('Longitude:', lon);
+  // }
 
-    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
+  _loadMap(lat, lon) {
+    const coords = [lat, lon];
 
+    if (this.#map) {
+      this.#map.setView(coords, 13);
+    } else {
+      // Initialize the map if it doesn't exist
+      this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
+    }
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -135,8 +186,11 @@ class App {
 
   _hideForm() {
     // Empty inputs
-    inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value =
-      '';
+    inputDistance.value =
+      inputDuration.value =
+      inputCadence.value =
+      inputElevation.value =
+        '';
 
     form.style.display = 'none';
     form.classList.add('hidden');
