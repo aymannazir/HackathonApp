@@ -1,6 +1,26 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const authRoutes = require('./routes/authRoutes');
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Replace `mydatabase` with your actual database name
+const dbURI = 'mongodb://localhost:27017/mydatabase';
+
+mongoose.connect(dbURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const db = mongoose.connection;
+
+db.on('error', err => {
+  console.error('Connection error:', err);
+});
+
+db.once('open', () => {
+  console.log('Connected to MongoDB');
+});
 
 // Middleware
 app.use(express.json());
