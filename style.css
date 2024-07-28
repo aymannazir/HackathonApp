@@ -228,7 +228,7 @@ a:visited {
   font-size: 16px;
 }
 
-.size-6 {
+.search-btn {
   width: 50px;
   height: 50px;
   border: none;
@@ -237,6 +237,47 @@ a:visited {
   stroke: #495057;
   border-radius: 10rem;
 }
+
+.search-btn:hover {
+  background-color: #d9480f;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.add-ride-btn:hover {
+  background-color: #d9480f;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.add-ride-btn {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000;
+  background-color: #ffb545;
+  padding: 10px 20px;
+  border: none;
+  position: absolute;
+  top: 40px;
+  right: 100px;
+  z-index: 1000;
+  border-radius: 10rem;
+  display: flex;
+  align-items: center;
+}
+
+.add-ride-btn:hover {
+  background-color: #d9480f;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.add-ride-icon {
+  width: 30px;
+  height: 30px;
+  stroke: #000;
+}
+
 /*  */
 
 /* Popup width is defined in JS using options */
@@ -279,6 +320,6 @@ a:visited {
   grid-column: 1/-1;
 }
 
-.workout__title2 {
+.workout__title1 {
   grid-row: 5/-1;
 }
